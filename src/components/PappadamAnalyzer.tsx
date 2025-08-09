@@ -97,6 +97,71 @@ function playBubbleMusic(diameters: number[]) {
   });
 }
 
+const RANDOM_FORTUNES = [
+  "A crispy opportunity will knock soon — don’t let it burn.",
+  "Your future holds endless snacks, but beware of soggy endings.",
+  "A stranger will offer you chutney — say yes.",
+  "Your week will be full of bubbles… in unexpected places.",
+  "One pappadam today will save you from three boring meetings tomorrow.",
+  "The more bubbles you have, the more joy you’ll attract.",
+  "A golden snack will change your mood instantly.",
+  "Beware the overcooked — they bring only bitterness.",
+  "Your destiny is as crunchy as your last bite.",
+  "A perfect bubble pattern means a perfect day ahead.",
+];
+
+const RANDOM_WEATHER = [
+  "Crisp skies with a light aroma of fried flour.",
+  "Cloudy, but with golden patches of sunshine like fresh pappadams.",
+  "Humidity 80% — ideal for maximum crunch retention.",
+  "Forecast: scattered snacks across your desk.",
+  "High crunch winds approaching from the kitchen.",
+  "Chutney drizzle expected in the evening.",
+  "Sunny with occasional oil vapour sightings.",
+  "Unseasonal heat — pappadam frying may increase.",
+  "Warm and bubbly — just like your pappadam.",
+  "Low pressure system, high appetite probability.",
+];
+
+const RANDOM_PERSONALITY = [
+  "Bubbly and optimistic, but prone to slight oiliness under stress.",
+  "Golden-hearted with a thin crispy shell.",
+  "Flaky at times, but always adds flavor to life.",
+  "Soft inside, crunchy outside — a people-pleaser.",
+  "Full of surprises and little pockets of joy.",
+  "Adventurous — not afraid of the deep fryer of life.",
+  "Classic and dependable, like a timeless snack.",
+  "Rare and exquisite, but hard to make perfectly.",
+  "Playful spirit with a dash of spice.",
+  "Unpredictable texture — keeps life interesting.",
+];
+
+const SNACK_COMPAT = [
+  { name: "Masala chai", score: 92 },
+  { name: "Coconut chutney", score: 85 },
+  { name: "Sambar", score: 88 },
+  { name: "Green chilli pickle", score: 90 },
+  { name: "Filter coffee", score: 70 },
+  { name: "Rasam", score: 78 },
+  { name: "Tomato chutney", score: 82 },
+  { name: "Buttermilk", score: 65 },
+  { name: "Mint chutney", score: 80 },
+  { name: "Tamarind dip", score: 87 },
+] as const;
+
+const HEALTH_SUGGESTIONS = [
+  "Pair with chutney to boost happiness index.",
+  "Avoid over-frying to maintain inner peace.",
+  "Drink water to balance crunch-to-thirst ratio.",
+  "Share your pappadam — doubles joy, halves calories.",
+  "Best enjoyed while standing in the kitchen.",
+  "Laugh while eating — increases flavor absorption.",
+  "Limit intake to avoid extreme crunch fatigue.",
+  "Dip occasionally to soften life’s edges.",
+  "Enjoy guilt-free — today is your cheat day.",
+  "Eat two — one for health, one for the soul.",
+];
+
 export default function PappadamAnalyzer() {
   const [cvReady, setCvReady] = useState(false);
   const [usingCamera, setUsingCamera] = useState(false);
@@ -116,13 +181,30 @@ export default function PappadamAnalyzer() {
     oilMl: 0,
   });
 
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null); // overlay for AR
-  const processCanvasRef = useRef<HTMLCanvasElement | null>(null); // hidden processing buffer
-  const uploadCanvasRef = useRef<HTMLCanvasElement | null>(null); // visible canvas for uploaded image
-  const reportRef = useRef<HTMLDivElement | null>(null);
+const [funPicks, setFunPicks] = useState({
+  fortune: RANDOM_FORTUNES[0],
+  weather: RANDOM_WEATHER[0],
+  personality: RANDOM_PERSONALITY[0],
+  health: HEALTH_SUGGESTIONS[0],
+});
 
-  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
+const shuffleFun = () => {
+  const pick = <T,>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];
+  setFunPicks({
+    fortune: pick(RANDOM_FORTUNES),
+    weather: pick(RANDOM_WEATHER),
+    personality: pick(RANDOM_PERSONALITY),
+    health: pick(HEALTH_SUGGESTIONS),
+  });
+};
+
+const videoRef = useRef<HTMLVideoElement | null>(null);
+const canvasRef = useRef<HTMLCanvasElement | null>(null); // overlay for AR
+const processCanvasRef = useRef<HTMLCanvasElement | null>(null); // hidden processing buffer
+const uploadCanvasRef = useRef<HTMLCanvasElement | null>(null); // visible canvas for uploaded image
+const reportRef = useRef<HTMLDivElement | null>(null);
+
+const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
 
   useEffect(() => {
     loadOpenCV()
@@ -132,7 +214,8 @@ export default function PappadamAnalyzer() {
       })
       .catch(() => toast("Failed to load OpenCV. Please refresh."));
   }, []);
-
+useEffect(() => { shuffleFun(); }, []);
+  
   useEffect(() => {
     let raf = 0;
     const tick = () => {
@@ -465,8 +548,26 @@ export default function PappadamAnalyzer() {
                               </div>
                             </div>
                             <Separator className="my-4" />
-                            <div className="font-fun text-lg">Mood: {stats.personality}</div>
+<div className="font-fun text-lg">Mood: {stats.personality}</div>
                             <div className="font-fun mt-1">Snack Horoscope: {stats.horoscope}</div>
+                            <div className="mt-3 grid gap-1 text-sm">
+                              <div><span className="text-muted-foreground">Random Fortune:</span> <span className="font-fun">{funPicks.fortune}</span></div>
+                              <div><span className="text-muted-foreground">Weather:</span> <span className="font-fun">{funPicks.weather}</span></div>
+                              <div><span className="text-muted-foreground">Personality Analysis:</span> <span className="font-fun">{funPicks.personality}</span></div>
+                              <div><span className="text-muted-foreground">Health Suggestion:</span> <span className="font-fun">{funPicks.health}</span></div>
+                            </div>
+                            <Separator className="my-3" />
+                            <div>
+                              <div className="text-sm font-medium">Snack Compatibility</div>
+                              <ul className="mt-1 grid grid-cols-2 gap-1 text-sm">
+                                {SNACK_COMPAT.map((s) => (
+                                  <li key={s.name} className="flex items-center justify-between">
+                                    <span>{s.name}</span>
+                                    <span className="font-semibold">{s.score}%</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
                             <div className="mt-4 flex items-center gap-4">
                               <Button onClick={generateCertificateQR}>Blockchain Bubble Certificate</Button>
                               {qrDataUrl && <img src={qrDataUrl} alt="Bubble Certificate QR" className="w-24 h-24" />}
@@ -506,9 +607,31 @@ export default function PappadamAnalyzer() {
                       <Stat label="Oil (est)" value={`${stats.oilMl} ml`} />
                       <Stat label="Quality" value={stats.rating} />
                     </div>
-                    <Separator className="my-4" />
+<Separator className="my-4" />
                     <div className="font-fun">Personality: {stats.personality}</div>
                     <div className="font-fun">Horoscope: {stats.horoscope}</div>
+                    <div className="mt-3 flex items-center justify-between">
+                      <div className="text-sm font-medium">Fun Extras</div>
+                      <Button size="sm" variant="secondary" onClick={shuffleFun}>Shuffle</Button>
+                    </div>
+                    <ul className="mt-2 space-y-1 text-sm">
+                      <li><span className="text-muted-foreground">Random Fortune:</span> <span className="font-fun">{funPicks.fortune}</span></li>
+                      <li><span className="text-muted-foreground">Weather:</span> <span className="font-fun">{funPicks.weather}</span></li>
+                      <li><span className="text-muted-foreground">Personality Analysis:</span> <span className="font-fun">{funPicks.personality}</span></li>
+                      <li><span className="text-muted-foreground">Health Suggestion:</span> <span className="font-fun">{funPicks.health}</span></li>
+                    </ul>
+                    <Separator className="my-4" />
+                    <div>
+                      <div className="text-sm font-medium mb-2">Snack Compatibility</div>
+                      <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-sm">
+                        {SNACK_COMPAT.map((s) => (
+                          <li key={s.name} className="flex items-center justify-between">
+                            <span>{s.name}</span>
+                            <span className="font-semibold">{s.score}%</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </CardContent>
                 </Card>
               </div>
