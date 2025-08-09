@@ -1,13 +1,16 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import PappadamAnalyzer from "@/components/PappadamAnalyzer";
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
+    <main className="min-h-screen bg-background">
+      <header className="container py-8">
+        <h1 className="sr-only">Pappadam Bubble Analyzer – Crunch Science Edition</h1>
+        <p className="text-sm text-muted-foreground">Kerala-themed, AR-powered, pseudo-scientific snack analysis.</p>
+      </header>
+      <section className="container pb-12">
+        <PappadamAnalyzer />
+      </section>
+    </main>
   );
 };
 
